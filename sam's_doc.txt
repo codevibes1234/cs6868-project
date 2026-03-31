@@ -1,0 +1,14 @@
+Background:
+Multiple threads are trying to access (and possibly modify) some shared object.
+We need a consistent order in the end.
+Can be achieved if all our threads agree on one order of execution.
+
+What we do:
+Each thread proposes to go in first, and our final choice is the "consensus" (since all other threads are agreeing on this).
+The Universal Construction depends in this consensus. We maintain a global log of the proposed operations.
+
+More stuff:
+
+Consensus Object: provides a "decide()" method to all the threads, which in turn call it with their input v at most once.
+
+When each thread calls the decide method, 
