@@ -7,7 +7,7 @@ type 'a t
 val create : ('a -> 'a) -> int -> 'a t
 
 (** Returns the node with the maximum sequence number in the array *)
-val max : 'a t Array.t -> 'a t
+val max : 'a t array -> 'a t
 
 (** Updates the sequence number of the given node *)
 val set_seq : 'a t -> int -> unit
