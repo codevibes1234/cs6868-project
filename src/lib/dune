@@ -1,4 +1,4 @@
 (library
  (name src)
- (modules CASConsensus Node LFUniversal WFUniversal SequentialStack LFStack WFStack)
+ (modules CASConsensus Node LFUniversal WFUniversal SequentialStack SequentialQueue SeqObject LFObject WFObject)
 )

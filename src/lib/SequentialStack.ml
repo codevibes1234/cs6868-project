@@ -8,6 +8,9 @@ type 'a op =
   | Push of 'a
   | Pop
 
+
+let empty = []
+
 (** [apply state op] applies the operation [op] to the stack [state], returning
     the new state and the result of the operation. *)
 let apply state op =
