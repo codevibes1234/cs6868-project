@@ -1,12 +1,12 @@
-type 'a t = {
-  announce : 'a Node.t Atomic.t array;
-  head : 'a Node.t Atomic.t array;
-  tail : 'a Node.t;
+type ('a,'b) t = {
+  announce : ('a,'b) Node.t Atomic.t array;
+  head : ('a,'b) Node.t Atomic.t array;
+  tail : ('a,'b) Node.t;
   num_threads : int;
 }
 
 let create num_threads = 
-  let tail = Node.create (fun x -> x) num_threads in 
+  let tail = Node.create None num_threads in 
   Node.set_seq tail 1;
   {
     head = Array.init num_threads (fun _ -> Atomic.make tail);
@@ -40,9 +40,17 @@ let apply wfu_obj invoc new_obj tid =
   let ann_i = Atomic.get wfu_obj.announce.(tid) in
   Atomic.set wfu_obj.head.(tid) ann_i;
   let rec app current acc = 
-    if current = Some ann_i then (Node.get_invoc ann_i) acc
+    if current = Some ann_i then begin
+      match (Node.get_invoc ann_i) with
+      | Some invoc -> invoc acc
+      | None -> failwith "This should never happen"
+    end
     else begin match current with
-    | Some node -> app (Node.get_next node) ((Node.get_invoc node) acc)
+    | Some node -> begin
+      match (Node.get_invoc node) with
+      | Some invoc -> let (next, _) = invoc acc in app (Node.get_next node) next
+      | None -> failwith "This should never happen"
+      end
     | None -> failwith "This should never happen"
     end
   in
