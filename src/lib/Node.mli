@@ -4,7 +4,7 @@
 type ('a,'b) t
 
 (** Creates a new node with the given value and sequence number *)
-val create : ('a -> 'b -> 'a * 'b) option -> int -> ('a,'b) t
+val create : ('a -> 'a * 'b) option -> int -> ('a,'b) t
 
 (** Returns the node with the maximum sequence number in the array *)
 val max : ('a,'b) t array -> ('a,'b) t
@@ -25,4 +25,4 @@ val set_next : ('a,'b) t -> ('a,'b) t -> unit
 val get_next : ('a,'b) t -> ('a,'b) t option
 
 (** returns the function stored in the given node *)
-val get_invoc : ('a,'b) t -> ('a -> 'b -> 'a * 'b) option
+val get_invoc : ('a,'b) t -> ('a -> 'a * 'b) option
