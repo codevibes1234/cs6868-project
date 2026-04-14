@@ -1,4 +1,10 @@
 (library
  (name src)
- (modules CASConsensus Node LFUniversal WFUniversal SequentialStack LFStack WFStack)
+ (libraries sequential)
+ (modules 
+  CASConsensus 
+  Node 
+  LFUniversal 
+  WFUniversal
+  Universal)
 )

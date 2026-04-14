@@ -1,3 +1,7 @@
 (test
- (name test_src)
- (libraries src))
+ (name test_sequential)
+ (libraries src sequential))
+
+(test
+ (name test_concurrent)
+ (libraries src sequential))

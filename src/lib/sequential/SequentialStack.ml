@@ -1,4 +1,4 @@
-(** Sequential stack interface *)
+(** Sequential stack implementation *)
 
 (** The type representing the state of the stack *)
 type 'a state = 'a list
@@ -8,6 +8,16 @@ type 'a op =
   | Push of 'a
   | Pop
 
+
+let empty = []
+
 (** [apply state op] applies the operation [op] to the stack [state], returning
     the new state and the result of the operation. *)
-val apply : 'a state -> 'a op -> 'a state * 'a option
+let apply state op =
+  match op with
+  | Push x -> (x :: state, None)
+  | Pop -> (
+      match state with
+      | [] -> ([], None)
+      | x :: xs -> (xs, Some x)
+    )
