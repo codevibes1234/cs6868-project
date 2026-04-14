@@ -40,7 +40,10 @@ let apply wfu_obj new_obj invoc tid =
   let ann_i = Atomic.get wfu_obj.announce.(tid) in
   Atomic.set wfu_obj.head.(tid) ann_i;
   let rec app current acc = 
-    if current = Some ann_i then begin
+    if match current with
+      | Some node -> node == ann_i
+      | None -> false
+    then begin
       match (Node.get_invoc ann_i) with
       | Some invoc -> invoc acc
       | None -> failwith "This should never happen"

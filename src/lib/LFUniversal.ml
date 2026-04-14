@@ -30,7 +30,10 @@ let apply lfu_obj new_obj invoc tid =
   in
   aux ();
   let rec app current acc = 
-    if current = Some prefer then begin match Node.get_invoc prefer with
+    if match current with
+      | Some node -> node == prefer
+      | None -> false
+    then begin match Node.get_invoc prefer with
                                   | Some invoc -> invoc acc
                                   | None -> failwith "This should never happen"
                                   end

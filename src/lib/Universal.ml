@@ -16,7 +16,7 @@ module Make (Uni : U) (Seq : Sequential.SeqObject.S) = struct
   }
 
   let apply obj op tid =
-    let invoc = Seq.apply op in
+    let invoc state = Seq.apply state op in
     let initial_obj = Seq.empty in
     let (_new_state, result) = Uni.apply obj.u initial_obj invoc tid in
     result

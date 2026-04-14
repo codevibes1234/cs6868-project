@@ -1,14 +1,21 @@
 open Src
 open Sequential
 
-module MakeLF (Seq : Sequential.SeqObject.S) = struct
+module type SeqLike = sig
+  type 'a state
+  type 'a op
+  val apply : 'a op -> 'a state -> 'a state * 'a option
+  val empty : 'a state
+end
+
+module MakeLF (Seq : SeqLike) = struct
   type 'a t = ('a Seq.state * 'a option, 'a option) LFUniversal.t
 
   let create = LFUniversal.create
 
   let apply obj op tid =
     let invoc (state, _) =
-      let (next_state, result) = Seq.apply state op in
+      let (next_state, result) = Seq.apply op state in
       ((next_state, result), result)
     in
     let initial_obj = (Seq.empty, None) in
@@ -16,14 +23,14 @@ module MakeLF (Seq : Sequential.SeqObject.S) = struct
     result
 end
 
-module MakeWF (Seq : Sequential.SeqObject.S) = struct
+module MakeWF (Seq : SeqLike) = struct
   type 'a t = ('a Seq.state * 'a option, 'a option) WFUniversal.t
 
   let create = WFUniversal.create
 
   let apply obj op tid =
     let invoc (state, _) =
-      let (next_state, result) = Seq.apply state op in
+      let (next_state, result) = Seq.apply op state in
       ((next_state, result), result)
     in
     let initial_obj = (Seq.empty, None) in
@@ -71,7 +78,6 @@ end) = struct
   let test_stack_sequential () =
     Printf.printf "Stack: testing sequential operations...\n%!";
     let s = U.Stack.create num_threads in
-    print_endline "Venky1";
     assert (U.Stack.apply s SequentialStack.Pop 0 = None);
     ignore (U.Stack.apply s (SequentialStack.Push 1) 0);
     ignore (U.Stack.apply s (SequentialStack.Push 2) 0);
