@@ -1,5 +1,6 @@
 
 open Src
+open Sequential
 
 let test_stack_push_pop () =
   let s = SequentialStack.empty in
