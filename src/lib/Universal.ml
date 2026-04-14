@@ -4,7 +4,7 @@ module type U = sig
   val apply : 'a t -> ('a -> 'a) -> 'a -> int -> 'a
 end
 
-module Make (Uni : U) (Seq : SeqObject.S) = struct
+module Make (Uni : U) (Seq : Sequential.SeqObject.S) = struct
   type 'a t = {
     u : ('a Seq.state * 'a option) Uni.t;
     num_threads : int;
