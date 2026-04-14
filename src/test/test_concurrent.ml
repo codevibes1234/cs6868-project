@@ -355,6 +355,9 @@ let () =
   LFTests.test_queue_interleaved ();
   LFTests.test_queue_fill_and_drain ();
   LFTests.test_queue_concurrent ();
+  LFTests.test_list_sequential ();
+  LFTests.test_list_concurrent ();
+  LFTests.test_list_high_contention ();
 
   Printf.printf "\n=== WF Tests ===\n\n%!";
   WFTests.test_stack_sequential ();
@@ -365,5 +368,8 @@ let () =
   WFTests.test_queue_interleaved ();
   WFTests.test_queue_fill_and_drain ();
   WFTests.test_queue_concurrent ();
+  WFTests.test_list_sequential ();
+  WFTests.test_list_concurrent ();
+  WFTests.test_list_high_contention ();
 
   Printf.printf "\nAll tests passed for both LF and WF!\n%!"
