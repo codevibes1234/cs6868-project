@@ -50,3 +50,9 @@ prohibitive overhead?
 1. Task 1 - Venkat (Deadline 12th)
 2. Task 2 - Sameer (Deadline 12th)
 3. Task 3 - Siddharth (Deadline 12th)
+
+Status: Done
+
+4. Task 4 - QCheck-Lin, QCheck-STM to Siddharth and Sameer (Deadline 17th)
+5. Task 6 - Benchmarking to Venky (Deadline 17th)
+ 
