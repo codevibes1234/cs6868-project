@@ -16,7 +16,7 @@ let create num_threads =
   }
 
 let apply wfu_obj invoc new_obj tid =
-  let anc = Node.create invoc wfu_obj.num_threads in
+  let anc = Node.create (Some invoc) wfu_obj.num_threads in
   Atomic.set wfu_obj.announce.(tid) anc;
   Atomic.set wfu_obj.head.(tid) (Node.max (Array.map Atomic.get wfu_obj.head));
   let rec aux () = 
