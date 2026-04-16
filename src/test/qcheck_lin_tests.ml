@@ -1,11 +1,11 @@
 
 open QCheck
-open Lin
+(* open QCheck_lin *)
 open Universal_instances
 
 
 
-let int_small = QCheck.small_int
+let int_small = nat_small
 
 
 (* STACK *)
@@ -24,10 +24,10 @@ end) = struct
     let open Lin in
     [
       val_ "push" (fun s x tid -> S.apply s (Sequential.SequentialStack.Push x) tid)
-        (t @-> int_small @-> int @-> returning option int);
+        (t @-> int_small @-> int @-> returning (option int));
 
       val_ "pop" (fun s tid -> S.apply s Sequential.SequentialStack.Pop tid)
-        (t @-> int @-> returning option int);
+        (t @-> int @-> returning (option int));
     ]
 end
 
@@ -51,10 +51,10 @@ end) = struct
     let open Lin in
     [
       val_ "enq" (fun q x tid -> Q.apply q (Sequential.SequentialQueue.Enqueue x) tid)
-        (t @-> int_small @-> int @-> returning option int);
+        (t @-> int_small @-> int @-> returning (option int));
 
       val_ "deq" (fun q tid -> Q.apply q Sequential.SequentialQueue.Dequeue tid)
-        (t @-> int @-> returning option int);
+        (t @-> int @-> returning (option int));
     ]
 end
 
@@ -79,15 +79,15 @@ end) = struct
     [
       val_ "insert"
         (fun l x tid -> L.apply l (Sequential.SequentialSortedList.Insert x) tid)
-        (t @-> int_small @-> int @-> returning option int);
+        (t @-> int_small @-> int @-> returning (option int));
 
       val_ "remove"
         (fun l x tid -> L.apply l (Sequential.SequentialSortedList.Remove x) tid)
-        (t @-> int_small @-> int @-> returning option int);
+        (t @-> int_small @-> int @-> returning (option int));
 
       val_ "contains"
         (fun l x tid -> L.apply l (Sequential.SequentialSortedList.Contains x) tid)
-        (t @-> int_small @-> int @-> returning option int);
+        (t @-> int_small @-> int @-> returning (option int));
     ]
 end
 
@@ -112,21 +112,20 @@ end) = struct
     [
       val_ "insert"
         (fun l x tid -> L.apply l (Universal_instances.SeqSkipListAdapter.Insert x) tid)
-        (t @-> int_small @-> int @-> returning option int);
+        (t @-> int_small @-> int @-> returning (option int));
 
       val_ "remove"
         (fun l x tid -> L.apply l (Universal_instances.SeqSkipListAdapter.Remove x) tid)
-        (t @-> int_small @-> int @-> returning option int);
+        (t @-> int_small @-> int @-> returning (option int));
 
       val_ "contains"
         (fun l x tid -> L.apply l (Universal_instances.SeqSkipListAdapter.Contains x) tid)
-        (t @-> int_small @-> int @-> returning option int);
+        (t @-> int_small @-> int @-> returning (option int));
     ]
 end
 
 module LFSkipListTest = Lin_domain.Make(SkipListSpec(LFSkipList))
 module WFSkipListTest = Lin_domain.Make(SkipListSpec(WFSkipList))
-
 
 
 let () =

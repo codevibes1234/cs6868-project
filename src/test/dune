@@ -5,3 +5,12 @@
 (test
  (name test_concurrent)
  (libraries src sequential))
+
+(test
+ (name qcheck_lin_tests)
+ (libraries
+  src
+  sequential
+  qcheck-core
+  qcheck-lin.lin
+  qcheck-lin.domain))
