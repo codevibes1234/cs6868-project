@@ -62,39 +62,15 @@ end
 module SkipListSeq = struct
   type 'a state = 'a SequentialSkipList.state
   type 'a op = 'a SequentialSkipList.op
-
   let empty () = SequentialSkipList.empty ()
-
-  let apply op state =
-    match op with
-    | SequentialSkipList.Insert x ->
-        let next_state, _ = SequentialSkipList.apply (SequentialSkipList.Insert x) state in
-        (next_state, None)
-    | SequentialSkipList.Remove x ->
-        let next_state, _ = SequentialSkipList.apply (SequentialSkipList.Remove x) state in
-        (next_state, None)
-    | SequentialSkipList.Contains x ->
-        let next_state, present = SequentialSkipList.apply (SequentialSkipList.Contains x) state in
-        (next_state, if present = Some true then Some x else None)
+  let apply op state = SequentialSkipList.apply op state
 end
 
 module BstSeq = struct
   type 'a state = 'a SequentialBst.state
   type 'a op = 'a SequentialBst.op
-
   let empty () = SequentialBst.empty Stdlib.compare
-
-  let apply op state =
-    match op with
-    | SequentialBst.Insert x ->
-        let next_state, _ = SequentialBst.apply (SequentialBst.Insert x) state in
-        (next_state, None)
-    | SequentialBst.Remove x ->
-        let next_state, _ = SequentialBst.apply (SequentialBst.Remove x) state in
-        (next_state, None)
-    | SequentialBst.Contains x ->
-        let next_state, present = SequentialBst.apply (SequentialBst.Contains x) state in
-        (next_state, if present = Some true then Some x else None)
+  let apply op state = SequentialBst.apply op state
 end
 
 module LFStack = MakeLF(StackSeq)
