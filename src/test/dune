@@ -7,5 +7,12 @@
  (libraries src sequential))
 
 (test
+ (name qcheck_lin_tests)
+ (libraries
+  src
+  sequential
+  qcheck-core
+  qcheck-lin.lin
+  qcheck-lin.domain))
  (name test_qcheck_stm)
  (libraries src sequential qcheck-stm.domain qcheck-stm.sequential))
