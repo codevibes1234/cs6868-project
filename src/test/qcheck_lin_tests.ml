@@ -6,9 +6,8 @@ let int_small = nat_small
 (* IMPORTANT: must match create *)
 let num_threads = 2
 
-let norm_tid tid =
-  let m = tid mod num_threads in
-  if m < 0 then m + num_threads else m
+let norm_tid tid = tid mod num_threads
+  
 
 
 (* ================= STACK ================= *)
@@ -29,12 +28,12 @@ end) = struct
       val_ "push"
         (fun s x tid ->
           S.apply s (Sequential.SequentialStack.Push x) (norm_tid tid))
-        (t @-> int_small @-> int @-> returning (option int));
+        (t @-> int_small @-> int_small @-> returning (option int));
 
       val_ "pop"
         (fun s tid ->
           S.apply s Sequential.SequentialStack.Pop (norm_tid tid))
-        (t @-> int @-> returning (option int));
+        (t @-> int_small @-> returning (option int));
     ]
 end
 
@@ -60,12 +59,12 @@ end) = struct
       val_ "enq"
         (fun q x tid ->
           Q.apply q (Sequential.SequentialQueue.Enqueue x) (norm_tid tid))
-        (t @-> int_small @-> int @-> returning (option int));
+        (t @-> int_small @-> int_small @-> returning (option int));
 
       val_ "deq"
         (fun q tid ->
           Q.apply q Sequential.SequentialQueue.Dequeue (norm_tid tid))
-        (t @-> int @-> returning (option int));
+        (t @-> int_small @-> returning (option int));
     ]
 end
 
@@ -91,17 +90,17 @@ end) = struct
       val_ "insert"
         (fun l x tid ->
           L.apply l (Sequential.SequentialSortedList.Insert x) (norm_tid tid))
-        (t @-> int_small @-> int @-> returning (option int));
+        (t @-> int_small @-> int_small @-> returning (option int));
 
       val_ "remove"
         (fun l x tid ->
           L.apply l (Sequential.SequentialSortedList.Remove x) (norm_tid tid))
-        (t @-> int_small @-> int @-> returning (option int));
+        (t @-> int_small @-> int_small @-> returning (option int));
 
       val_ "contains"
         (fun l x tid ->
           L.apply l (Sequential.SequentialSortedList.Contains x) (norm_tid tid))
-        (t @-> int_small @-> int @-> returning (option int));
+        (t @-> int_small @-> int_small @-> returning (option int));
     ]
 end
 
@@ -131,19 +130,19 @@ end) = struct
         (fun l x tid ->
           L.apply l (Universal_instances.SeqSkipListAdapter.Insert x)
             (norm_tid tid))
-        (t @-> int_small @-> int @-> returning (option int));
+        (t @-> int_small @-> int_small @-> returning (option int));
 
       val_ "remove"
         (fun l x tid ->
           L.apply l (Universal_instances.SeqSkipListAdapter.Remove x)
             (norm_tid tid))
-        (t @-> int_small @-> int @-> returning (option int));
+        (t @-> int_small @-> int_small @-> returning (option int));
 
       val_ "contains"
         (fun l x tid ->
           L.apply l (Universal_instances.SeqSkipListAdapter.Contains x)
             (norm_tid tid))
-        (t @-> int_small @-> int @-> returning (option int));
+        (t @-> int_small @-> int_small @-> returning (option int));
     ]
 end
 
