@@ -116,7 +116,7 @@ let erase sl value =
       | _ -> ()
     done;
 
-    while sl.level > 0 && update.(0) == sl.head && sl.head.forward.(sl.level) == Some sl.tail do
+    while sl.level > 0 && sl.head.forward.(sl.level) == Some sl.tail do
       sl.level <- sl.level - 1
     done
   | _ -> ()
