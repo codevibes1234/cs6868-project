@@ -13,13 +13,13 @@ module MakeLF (Seq : SeqLike) = struct
 
   let create = LFUniversal.create
 
-  let apply obj op tid =
+  let apply obj op =
     let invoc (state, _) =
       let (next_state, result) = Seq.apply op state in
       ((next_state, result), result)
     in
     let initial_obj = (Seq.empty (), None) in
-    let (_new_obj, result) = LFUniversal.apply obj initial_obj invoc tid in
+    let (_new_obj, result) = LFUniversal.apply obj initial_obj invoc in
     result
 end
 
@@ -28,13 +28,13 @@ module MakeWF (Seq : SeqLike) = struct
 
   let create = WFUniversal.create
 
-  let apply obj op tid =
+  let apply obj op =
     let invoc (state, _) =
       let (next_state, result) = Seq.apply op state in
       ((next_state, result), result)
     in
     let initial_obj = (Seq.empty (), None) in
-    let (_new_obj, result) = WFUniversal.apply obj initial_obj invoc tid in
+    let (_new_obj, result) = WFUniversal.apply obj initial_obj invoc in
     result
 end
 
@@ -91,31 +91,31 @@ module MakeTests (U : sig
   module Stack : sig
     type 'a t
     val create : int -> 'a t
-    val apply : 'a t -> 'a SequentialStack.op -> int -> 'a option
+    val apply : 'a t -> 'a SequentialStack.op -> 'a option
   end
 
   module Queue : sig
     type 'a t
     val create : int -> 'a t
-    val apply : 'a t -> 'a SequentialQueue.op -> int -> 'a option
+    val apply : 'a t -> 'a SequentialQueue.op -> 'a option
   end
 
   module SortedList : sig
     type 'a t
     val create : int -> 'a t
-    val apply : 'a t -> 'a SequentialSortedList.op -> int -> 'a option
+    val apply : 'a t -> 'a SequentialSortedList.op -> 'a option
   end
 
   module SkipList : sig
     type 'a t
     val create : int -> 'a t
-    val apply : 'a t -> 'a SequentialSkipList.op -> int -> 'a option
+    val apply : 'a t -> 'a SequentialSkipList.op -> 'a option
   end
 
   module SequentialBst : sig
     type 'a t
     val create : int -> 'a t
-    val apply : 'a t -> 'a SequentialBst.op -> int -> 'a option
+    val apply : 'a t -> 'a SequentialBst.op -> 'a option
   end
   
 end) = struct
@@ -127,28 +127,28 @@ end) = struct
   let test_stack_sequential () =
     Printf.printf "Stack: testing sequential operations...\n%!";
     let s = U.Stack.create num_threads in
-    assert (U.Stack.apply s SequentialStack.Pop 0 = None);
-    ignore (U.Stack.apply s (SequentialStack.Push 1) 0);
-    ignore (U.Stack.apply s (SequentialStack.Push 2) 0);
-    ignore (U.Stack.apply s (SequentialStack.Push 3) 0);
-    assert (U.Stack.apply s SequentialStack.Pop 0 = Some 3);
-    assert (U.Stack.apply s SequentialStack.Pop 0 = Some 2);
-    assert (U.Stack.apply s SequentialStack.Pop 0 = Some 1);
-    assert (U.Stack.apply s SequentialStack.Pop 0 = None);
+    assert (U.Stack.apply s SequentialStack.Pop = None);
+    ignore (U.Stack.apply s (SequentialStack.Push 1));
+    ignore (U.Stack.apply s (SequentialStack.Push 2));
+    ignore (U.Stack.apply s (SequentialStack.Push 3));
+    assert (U.Stack.apply s SequentialStack.Pop = Some 3);
+    assert (U.Stack.apply s SequentialStack.Pop = Some 2);
+    assert (U.Stack.apply s SequentialStack.Pop = Some 1);
+    assert (U.Stack.apply s SequentialStack.Pop = None);
     Printf.printf "Stack: sequential OK\n%!"
 
   let test_stack_interleaved () =
     Printf.printf "Stack: testing interleaved push/pop...\n%!";
     let s = U.Stack.create num_threads in
-    ignore (U.Stack.apply s (SequentialStack.Push 10) 0);
-    assert (U.Stack.apply s SequentialStack.Pop 0 = Some 10);
-    ignore (U.Stack.apply s (SequentialStack.Push 20) 0);
-    ignore (U.Stack.apply s (SequentialStack.Push 30) 0);
-    assert (U.Stack.apply s SequentialStack.Pop 0 = Some 30);
-    ignore (U.Stack.apply s (SequentialStack.Push 40) 0);
-    assert (U.Stack.apply s SequentialStack.Pop 0 = Some 40);
-    assert (U.Stack.apply s SequentialStack.Pop 0 = Some 20);
-    assert (U.Stack.apply s SequentialStack.Pop 0 = None);
+    ignore (U.Stack.apply s (SequentialStack.Push 10));
+    assert (U.Stack.apply s SequentialStack.Pop = Some 10);
+    ignore (U.Stack.apply s (SequentialStack.Push 20));
+    ignore (U.Stack.apply s (SequentialStack.Push 30));
+    assert (U.Stack.apply s SequentialStack.Pop = Some 30);
+    ignore (U.Stack.apply s (SequentialStack.Push 40));
+    assert (U.Stack.apply s SequentialStack.Pop = Some 40);
+    assert (U.Stack.apply s SequentialStack.Pop = Some 20);
+    assert (U.Stack.apply s SequentialStack.Pop = None);
     Printf.printf "Stack: interleaved OK\n%!"
 
   let test_stack_fill_and_drain () =
@@ -156,12 +156,12 @@ end) = struct
     let n = 1000 in
     let s = U.Stack.create num_threads in
     for i = 0 to n - 1 do
-      ignore (U.Stack.apply s (SequentialStack.Push i) 0)
+      ignore (U.Stack.apply s (SequentialStack.Push i))
     done;
     for i = n - 1 downto 0 do
-      assert (U.Stack.apply s SequentialStack.Pop 0 = Some i)
+      assert (U.Stack.apply s SequentialStack.Pop = Some i)
     done;
-    assert (U.Stack.apply s SequentialStack.Pop 0 = None);
+    assert (U.Stack.apply s SequentialStack.Pop = None);
     Printf.printf "Stack: fill and drain OK\n%!"
 
   let test_stack_concurrent () =
@@ -178,13 +178,13 @@ end) = struct
     let producer id =
       let start = id * items_per_producer in
       for i = start to start + items_per_producer - 1 do
-        ignore (U.Stack.apply s (SequentialStack.Push i) id)
+        ignore (U.Stack.apply s (SequentialStack.Push i))
       done
     in
 
     let consumer id =
       while Atomic.get consumed < total_items do
-        match U.Stack.apply s SequentialStack.Pop (num_producers + id) with
+        match U.Stack.apply s SequentialStack.Pop with
         | Some v ->
             Mutex.lock seen_lock;
             seen.(v) <- true;
@@ -221,28 +221,28 @@ end) = struct
   let test_queue_sequential () =
     Printf.printf "Queue: testing sequential operations...\n%!";
     let q = U.Queue.create num_threads in
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = None);
-    ignore (U.Queue.apply q (SequentialQueue.Enqueue 1) 0);
-    ignore (U.Queue.apply q (SequentialQueue.Enqueue 2) 0);
-    ignore (U.Queue.apply q (SequentialQueue.Enqueue 3) 0);
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = Some 1);
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = Some 2);
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = Some 3);
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = None);
+    assert (U.Queue.apply q SequentialQueue.Dequeue = None);
+    ignore (U.Queue.apply q (SequentialQueue.Enqueue 1));
+    ignore (U.Queue.apply q (SequentialQueue.Enqueue 2));
+    ignore (U.Queue.apply q (SequentialQueue.Enqueue 3));
+    assert (U.Queue.apply q SequentialQueue.Dequeue = Some 1);
+    assert (U.Queue.apply q SequentialQueue.Dequeue = Some 2);
+    assert (U.Queue.apply q SequentialQueue.Dequeue = Some 3);
+    assert (U.Queue.apply q SequentialQueue.Dequeue = None);
     Printf.printf "Queue: sequential OK\n%!"
 
   let test_queue_interleaved () =
     Printf.printf "Queue: testing interleaved enq/deq...\n%!";
     let q = U.Queue.create num_threads in
-    ignore (U.Queue.apply q (SequentialQueue.Enqueue 10) 0);
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = Some 10);
-    ignore (U.Queue.apply q (SequentialQueue.Enqueue 20) 0);
-    ignore (U.Queue.apply q (SequentialQueue.Enqueue 30) 0);
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = Some 20);
+    ignore (U.Queue.apply q (SequentialQueue.Enqueue 10));
+    assert (U.Queue.apply q SequentialQueue.Dequeue = Some 10);
+    ignore (U.Queue.apply q (SequentialQueue.Enqueue 20));
+    ignore (U.Queue.apply q (SequentialQueue.Enqueue 30));
+    assert (U.Queue.apply q SequentialQueue.Dequeue = Some 20);
     ignore (U.Queue.apply q (SequentialQueue.Enqueue 40) 0);
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = Some 30);
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = Some 40);
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = None);
+    assert (U.Queue.apply q SequentialQueue.Dequeue = Some 30);
+    assert (U.Queue.apply q SequentialQueue.Dequeue = Some 40);
+    assert (U.Queue.apply q SequentialQueue.Dequeue = None);
     Printf.printf "Queue: interleaved OK\n%!"
 
   let test_queue_fill_and_drain () =
@@ -250,12 +250,12 @@ end) = struct
     let n = 1000 in
     let q = U.Queue.create num_threads in
     for i = 0 to n - 1 do
-      ignore (U.Queue.apply q (SequentialQueue.Enqueue i) 0)
+      ignore (U.Queue.apply q (SequentialQueue.Enqueue i))
     done;
     for i = 0 to n - 1 do
-      assert (U.Queue.apply q SequentialQueue.Dequeue 0 = Some i)
+      assert (U.Queue.apply q SequentialQueue.Dequeue = Some i)
     done;
-    assert (U.Queue.apply q SequentialQueue.Dequeue 0 = None);
+    assert (U.Queue.apply q SequentialQueue.Dequeue = None);
     Printf.printf "Queue: fill and drain OK\n%!"
 
   let test_queue_concurrent () =
@@ -272,13 +272,13 @@ end) = struct
     let producer id =
       let start = id * items_per_producer in
       for i = start to start + items_per_producer - 1 do
-        ignore (U.Queue.apply q (SequentialQueue.Enqueue i) id)
+        ignore (U.Queue.apply q (SequentialQueue.Enqueue i))
       done
     in
 
     let consumer id =
       while Atomic.get consumed < total_items do
-        match U.Queue.apply q SequentialQueue.Dequeue (num_producers + id) with
+        match U.Queue.apply q SequentialQueue.Dequeue with
         | Some v ->
             Mutex.lock seen_lock;
             seen.(v) <- true;
@@ -316,20 +316,20 @@ let test_list_sequential () =
   Printf.printf "List: testing sequential operations...\n%!";
   let l = U.SortedList.create num_threads in
 
-  ignore (U.SortedList.apply l (SequentialSortedList.Insert 5) 0);
-  ignore (U.SortedList.apply l (SequentialSortedList.Insert 10) 0);
-  ignore (U.SortedList.apply l (SequentialSortedList.Insert 3) 0);
+  ignore (U.SortedList.apply l (SequentialSortedList.Insert 5));
+  ignore (U.SortedList.apply l (SequentialSortedList.Insert 10));
+  ignore (U.SortedList.apply l (SequentialSortedList.Insert 3));
 
   (* duplicate insert *)
-  ignore (U.SortedList.apply l (SequentialSortedList.Insert 5) 0);
+  ignore (U.SortedList.apply l (SequentialSortedList.Insert 5));
 
-  assert (U.SortedList.apply l (SequentialSortedList.Contains 5) 0 = Some 5);
-  assert (U.SortedList.apply l (SequentialSortedList.Contains 10) 0 = Some 10);
-  assert (U.SortedList.apply l (SequentialSortedList.Contains 3) 0 = Some 3);
-  assert (U.SortedList.apply l (SequentialSortedList.Contains 7) 0 = None);
+  assert (U.SortedList.apply l (SequentialSortedList.Contains 5) = Some 5);
+  assert (U.SortedList.apply l (SequentialSortedList.Contains 10) = Some 10);
+  assert (U.SortedList.apply l (SequentialSortedList.Contains 3) = Some 3);
+  assert (U.SortedList.apply l (SequentialSortedList.Contains 7) = None);
 
-  ignore (U.SortedList.apply l (SequentialSortedList.Remove 5) 0);
-  assert (U.SortedList.apply l (SequentialSortedList.Contains 5) 0 = None);
+  ignore (U.SortedList.apply l (SequentialSortedList.Remove 5));
+  assert (U.SortedList.apply l (SequentialSortedList.Contains 5) = None);
 
   Printf.printf "List: sequential OK\n%!"
 
@@ -365,7 +365,7 @@ let test_list_concurrent () =
       let value = id * ops_per_domain + i in
       let expected = i mod 2 <> 0 in
 
-      let res = U.SortedList.apply l (SequentialSortedList.Contains value) 0 in
+      let res = U.SortedList.apply l (SequentialSortedList.Contains value) in
 
       match (expected, res) with
       | true, Some _ -> ()
@@ -385,13 +385,13 @@ let test_list_high_contention () =
   let n_domains = 8 in
   let n_ops = 1000 in
 
-  let worker id =
+  let worker _ =
     for _ = 1 to n_ops do
       let key = Random.int 10 in
       match Random.int 3 with
-      | 0 -> ignore (U.SortedList.apply l (SequentialSortedList.Insert key) id)
-      | 1 -> ignore (U.SortedList.apply l (SequentialSortedList.Remove key) id)
-      | _ -> ignore (U.SortedList.apply l (SequentialSortedList.Contains key) id)
+      | 0 -> ignore (U.SortedList.apply l (SequentialSortedList.Insert key))
+      | 1 -> ignore (U.SortedList.apply l (SequentialSortedList.Remove key))
+      | _ -> ignore (U.SortedList.apply l (SequentialSortedList.Contains key))
     done
   in
 
@@ -410,18 +410,18 @@ let test_skiplist_sequential () =
   Printf.printf "SkipList: testing sequential operations...\n%!";
   let l = U.SkipList.create num_threads in
 
-  ignore (U.SkipList.apply l (SequentialSkipList.Insert 5) 0);
-  ignore (U.SkipList.apply l (SequentialSkipList.Insert 10) 0);
-  ignore (U.SkipList.apply l (SequentialSkipList.Insert 3) 0);
-  ignore (U.SkipList.apply l (SequentialSkipList.Insert 5) 0);
+  ignore (U.SkipList.apply l (SequentialSkipList.Insert 5));
+  ignore (U.SkipList.apply l (SequentialSkipList.Insert 10));
+  ignore (U.SkipList.apply l (SequentialSkipList.Insert 3));
+  ignore (U.SkipList.apply l (SequentialSkipList.Insert 5));
 
-  assert (U.SkipList.apply l (SequentialSkipList.Contains 5) 0 = Some 5);
-  assert (U.SkipList.apply l (SequentialSkipList.Contains 10) 0 = Some 10);
-  assert (U.SkipList.apply l (SequentialSkipList.Contains 3) 0 = Some 3);
-  assert (U.SkipList.apply l (SequentialSkipList.Contains 7) 0 = None);
+  assert (U.SkipList.apply l (SequentialSkipList.Contains 5) = Some 5);
+  assert (U.SkipList.apply l (SequentialSkipList.Contains 10) = Some 10);
+  assert (U.SkipList.apply l (SequentialSkipList.Contains 3) = Some 3);
+  assert (U.SkipList.apply l (SequentialSkipList.Contains 7) = None);
 
-  ignore (U.SkipList.apply l (SequentialSkipList.Remove 5) 0);
-  assert (U.SkipList.apply l (SequentialSkipList.Contains 5) 0 = None);
+  ignore (U.SkipList.apply l (SequentialSkipList.Remove 5));
+  assert (U.SkipList.apply l (SequentialSkipList.Contains 5) = None);
 
   Printf.printf "SkipList: sequential OK\n%!"
 
@@ -437,9 +437,9 @@ let test_skiplist_concurrent () =
     let start = id * ops_per_domain in
     for i = 0 to ops_per_domain - 1 do
       let value = start + i in
-      ignore (U.SkipList.apply l (SequentialSkipList.Insert value) id);
+      ignore (U.SkipList.apply l (SequentialSkipList.Insert value));
       if i mod 2 = 0 then
-        ignore (U.SkipList.apply l (SequentialSkipList.Remove value) id);
+        ignore (U.SkipList.apply l (SequentialSkipList.Remove value));
     done
   in
 
@@ -453,7 +453,7 @@ let test_skiplist_concurrent () =
     for i = 0 to ops_per_domain - 1 do
       let value = id * ops_per_domain + i in
       let expected = i mod 2 <> 0 in
-      let res = U.SkipList.apply l (SequentialSkipList.Contains value) 0 in
+      let res = U.SkipList.apply l (SequentialSkipList.Contains value) in
       match (expected, res) with
       | true, Some _ -> ()
       | false, None -> ()
@@ -471,13 +471,13 @@ let test_skiplist_high_contention () =
   let n_domains = 8 in
   let n_ops = 1000 in
 
-  let worker id =
+  let worker _ =
     for _ = 1 to n_ops do
       let key = Random.int 10 in
       match Random.int 3 with
-      | 0 -> ignore (U.SkipList.apply l (SequentialSkipList.Insert key) id)
-      | 1 -> ignore (U.SkipList.apply l (SequentialSkipList.Remove key) id)
-      | _ -> ignore (U.SkipList.apply l (SequentialSkipList.Contains key) id)
+      | 0 -> ignore (U.SkipList.apply l (SequentialSkipList.Insert key))
+      | 1 -> ignore (U.SkipList.apply l (SequentialSkipList.Remove key))
+      | _ -> ignore (U.SkipList.apply l (SequentialSkipList.Contains key))
     done
   in
 
@@ -497,17 +497,17 @@ let test_skiplist_high_contention () =
     Printf.printf "SequentialBst: testing sequential operations...\n%!";
     let t = U.SequentialBst.create num_threads in
 
-    ignore (U.SequentialBst.apply t (SequentialBst.Insert 5) 0);
-    ignore (U.SequentialBst.apply t (SequentialBst.Insert 10) 0);
-    ignore (U.SequentialBst.apply t (SequentialBst.Insert 3) 0);
+    ignore (U.SequentialBst.apply t (SequentialBst.Insert 5));
+    ignore (U.SequentialBst.apply t (SequentialBst.Insert 10));
+    ignore (U.SequentialBst.apply t (SequentialBst.Insert 3));
 
-    assert (U.SequentialBst.apply t (SequentialBst.Contains 5) 0 = Some 5);
-    assert (U.SequentialBst.apply t (SequentialBst.Contains 10) 0 = Some 10);
-    assert (U.SequentialBst.apply t (SequentialBst.Contains 3) 0 = Some 3);
-    assert (U.SequentialBst.apply t (SequentialBst.Contains 7) 0 = None);
+    assert (U.SequentialBst.apply t (SequentialBst.Contains 5) = Some 5);
+    assert (U.SequentialBst.apply t (SequentialBst.Contains 10) = Some 10);
+    assert (U.SequentialBst.apply t (SequentialBst.Contains 3) = Some 3);
+    assert (U.SequentialBst.apply t (SequentialBst.Contains 7) = None);
 
-    ignore (U.SequentialBst.apply t (SequentialBst.Remove 5) 0);
-    assert (U.SequentialBst.apply t (SequentialBst.Contains 5) 0 = None);
+    ignore (U.SequentialBst.apply t (SequentialBst.Remove 5));
+    assert (U.SequentialBst.apply t (SequentialBst.Contains 5) = None);
 
     Printf.printf "SequentialBst: sequential OK\n%!"
 
@@ -523,9 +523,9 @@ let test_skiplist_high_contention () =
       let start = id * ops_per_domain in
       for i = 0 to ops_per_domain - 1 do
         let value = start + i in
-        ignore (U.SequentialBst.apply t (SequentialBst.Insert value) id);
+        ignore (U.SequentialBst.apply t (SequentialBst.Insert value));
         if i mod 2 = 0 then
-          ignore (U.SequentialBst.apply t (SequentialBst.Remove value) id);
+          ignore (U.SequentialBst.apply t (SequentialBst.Remove value));
       done
     in
 
@@ -539,7 +539,7 @@ let test_skiplist_high_contention () =
       for i = 0 to ops_per_domain - 1 do
         let value = id * ops_per_domain + i in
         let expected = i mod 2 <> 0 in
-        let res = U.SequentialBst.apply t (SequentialBst.Contains value) 0 in
+        let res = U.SequentialBst.apply t (SequentialBst.Contains value) in
         match (expected, res) with
         | true, Some _ -> ()
         | false, None -> ()
@@ -557,13 +557,13 @@ let test_skiplist_high_contention () =
     let n_domains = 8 in
     let n_ops = 1000 in
 
-    let worker id =
+    let worker _ =
       for _ = 1 to n_ops do
         let key = Random.int 1000 in
         match Random.int 3 with
-        | 0 -> ignore (U.SequentialBst.apply t (SequentialBst.Insert key) id)
-        | 1 -> ignore (U.SequentialBst.apply t (SequentialBst.Remove key) id)
-        | _ -> ignore (U.SequentialBst.apply t (SequentialBst.Contains key) id)
+        | 0 -> ignore (U.SequentialBst.apply t (SequentialBst.Insert key))
+        | 1 -> ignore (U.SequentialBst.apply t (SequentialBst.Remove key))
+        | _ -> ignore (U.SequentialBst.apply t (SequentialBst.Contains key))
       done
     in
 

@@ -4,11 +4,7 @@ open Universal_instances
 let int_small = nat_small
 
 (* IMPORTANT: must match create *)
-let num_threads = 2
-
-let norm_tid tid = tid mod num_threads
-  
-
+let num_threads = 10
 
 (* ================= STACK ================= *)
 
@@ -26,14 +22,14 @@ end) = struct
     let open Lin in
     [
       val_ "push"
-        (fun s x tid ->
-          S.apply s (Sequential.SequentialStack.Push x) (norm_tid tid))
-        (t @-> int_small @-> int_small @-> returning (option int));
+        (fun s x ->
+          S.apply s (Sequential.SequentialStack.Push x))
+        (t @-> int_small @-> returning (option int));
 
       val_ "pop"
-        (fun s tid ->
-          S.apply s Sequential.SequentialStack.Pop (norm_tid tid))
-        (t @-> int_small @-> returning (option int));
+        (fun s ->
+          S.apply s Sequential.SequentialStack.Pop)
+        (t @-> returning (option int));
     ]
 end
 
@@ -57,14 +53,14 @@ end) = struct
     let open Lin in
     [
       val_ "enq"
-        (fun q x tid ->
-          Q.apply q (Sequential.SequentialQueue.Enqueue x) (norm_tid tid))
-        (t @-> int_small @-> int_small @-> returning (option int));
+        (fun q x ->
+          Q.apply q (Sequential.SequentialQueue.Enqueue x))
+        (t @-> int_small @-> returning (option int));
 
       val_ "deq"
-        (fun q tid ->
-          Q.apply q Sequential.SequentialQueue.Dequeue (norm_tid tid))
-        (t @-> int_small @-> returning (option int));
+        (fun q->
+          Q.apply q Sequential.SequentialQueue.Dequeue)
+        (t @-> returning (option int));
     ]
 end
 
@@ -88,19 +84,19 @@ end) = struct
     let open Lin in
     [
       val_ "insert"
-        (fun l x tid ->
-          L.apply l (Sequential.SequentialSortedList.Insert x) (norm_tid tid))
-        (t @-> int_small @-> int_small @-> returning (option int));
+        (fun l x ->
+          L.apply l (Sequential.SequentialSortedList.Insert x) )
+        (t @-> int_small @-> returning (option int));
 
       val_ "remove"
-        (fun l x tid ->
-          L.apply l (Sequential.SequentialSortedList.Remove x) (norm_tid tid))
-        (t @-> int_small @-> int_small @-> returning (option int));
+        (fun l x ->
+          L.apply l (Sequential.SequentialSortedList.Remove x))
+        (t @-> int_small @-> returning (option int));
 
       val_ "contains"
-        (fun l x tid ->
-          L.apply l (Sequential.SequentialSortedList.Contains x) (norm_tid tid))
-        (t @-> int_small @-> int_small @-> returning (option int));
+        (fun l x ->
+          L.apply l (Sequential.SequentialSortedList.Contains x))
+        (t @-> int_small @-> returning (option int));
     ]
 end
 
@@ -127,22 +123,19 @@ end) = struct
     let open Lin in
     [
       val_ "insert"
-        (fun l x tid ->
-          L.apply l (Universal_instances.SeqSkipListAdapter.Insert x)
-            (norm_tid tid))
-        (t @-> int_small @-> int_small @-> returning (option int));
+        (fun l x ->
+          L.apply l (Universal_instances.SeqSkipListAdapter.Insert x))
+        (t @-> int_small @-> returning (option int));
 
       val_ "remove"
-        (fun l x tid ->
-          L.apply l (Universal_instances.SeqSkipListAdapter.Remove x)
-            (norm_tid tid))
-        (t @-> int_small @-> int_small @-> returning (option int));
+        (fun l x ->
+          L.apply l (Universal_instances.SeqSkipListAdapter.Remove x))
+        (t @-> int_small @-> returning (option int));
 
       val_ "contains"
-        (fun l x tid ->
-          L.apply l (Universal_instances.SeqSkipListAdapter.Contains x)
-            (norm_tid tid))
-        (t @-> int_small @-> int_small @-> returning (option int));
+        (fun l x ->
+          L.apply l (Universal_instances.SeqSkipListAdapter.Contains x))
+        (t @-> int_small @-> returning (option int));
     ]
 end
 
@@ -155,15 +148,15 @@ module WFSkipListTest = Lin_domain.Make(SkipListSpec(WFSkipList))
 let () =
   QCheck_base_runner.run_tests_main [
 
-    LFStackTest.lin_test ~count:3 ~name:"LF Stack Lin";
-    WFStackTest.lin_test ~count:3 ~name:"WF Stack Lin";
+    (* LFStackTest.lin_test ~count:10 ~name:"LF Stack Lin";
+    WFStackTest.lin_test ~count:10 ~name:"WF Stack Lin";
 
-    (* LFQueueTest.lin_test ~count:3 ~name:"LF Queue Lin";
-    WFQueueTest.lin_test ~count:3 ~name:"WF Queue Lin";  
+    LFQueueTest.lin_test ~count:10 ~name:"LF Queue Lin";
+    WFQueueTest.lin_test ~count:10 ~name:"WF Queue Lin";   *)
 
-    LFListTest.lin_test ~count:3 ~name:"LF List Lin";
-    WFListTest.lin_test ~count:3 ~name:"WF List Lin";
+    LFListTest.lin_test ~count:100 ~name:"LF List Lin";
+    WFListTest.lin_test ~count:100 ~name:"WF List Lin";
 
-    LFSkipListTest.lin_test ~count:3 ~name:"LF SkipList Lin";
-    WFSkipListTest.lin_test ~count:3 ~name:"WF SkipList Lin"; *)
+    (* LFSkipListTest.lin_test ~count:10 ~name:"LF SkipList Lin";
+    WFSkipListTest.lin_test ~count:10 ~name:"WF SkipList Lin"; *)
   ]

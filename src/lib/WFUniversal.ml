@@ -15,7 +15,8 @@ let create num_threads =
     num_threads
   }
 
-let apply wfu_obj new_obj invoc tid =
+let apply wfu_obj new_obj invoc =
+  let tid = Domain.self_index () in
   let anc = Node.create (Some invoc) wfu_obj.num_threads in
   Atomic.set wfu_obj.announce.(tid) anc;
   Atomic.set wfu_obj.head.(tid) (Node.max (Array.map Atomic.get wfu_obj.head));
@@ -46,15 +47,15 @@ let apply wfu_obj new_obj invoc tid =
     then begin
       match (Node.get_invoc ann_i) with
       | Some invoc -> invoc acc
-      | None -> failwith "This should never happen"
+      | None -> failwith "This should never happen 6"
     end
     else begin match current with
     | Some node -> begin
       match (Node.get_invoc node) with
       | Some invoc -> let (next, _) = invoc acc in app (Node.get_next node) next
-      | None -> failwith "This should never happen"
+      | None -> failwith "This should never happen 7"
       end
-    | None -> failwith "This should never happen"
+    | None -> failwith "This should never happen 8"
     end
   in
   app (Node.get_next wfu_obj.tail) new_obj

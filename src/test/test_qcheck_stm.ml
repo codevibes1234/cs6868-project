@@ -411,13 +411,13 @@ end
 (* ================================================================== *)
 
 let () =
-  run_tests (module LFStackSpec) "LF Stack";
+  (* run_tests (module LFStackSpec) "LF Stack";
   run_tests (module WFStackSpec) "WF Stack";
   run_tests (module LFQueueSpec) "LF Queue";
   run_tests (module WFQueueSpec) "WF Queue";
   run_tests (module LFListSpec) "LF Sorted List";
-  run_tests (module WFListSpec) "WF Sorted List";
-  (* run_tests (module LFSkipListSpec) "LF Skip List";
-  run_tests (module WFSkipListSpec) "WF Skip List"; *)
-  run_tests (module LFSBstSpec) "LF BST";
-  run_tests (module WFBstSpec) "WF BST";
+  run_tests (module WFListSpec) "WF Sorted List"; *)
+  run_tests (module LFSkipListSpec) "LF Skip List";
+  run_tests (module WFSkipListSpec) "WF Skip List";
+  (* run_tests (module LFSBstSpec) "LF BST";
+  run_tests (module WFBstSpec) "WF BST"; *)

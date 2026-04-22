@@ -19,12 +19,12 @@ let decide consensus value tid =
   if Atomic.compare_and_set consensus.winner (-1) tid then begin
     match Atomic.get consensus.proposed.(tid) with
     | Some v -> v
-    | None -> failwith "This should never happen"
+    | None -> failwith "This should never happen 1"
   end
   else begin
     let winner_tid = Atomic.get consensus.winner in
     match Atomic.get consensus.proposed.(winner_tid) with
     | Some v -> v
-    | None -> failwith "This should never happen"
+    | None -> failwith "This should never happen 2"
   end
     

@@ -1,4 +1,3 @@
-
 type ('a,'b) t =
   {
     decide_next : ('a,'b) t CASConsensus.t;

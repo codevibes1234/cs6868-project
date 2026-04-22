@@ -1,7 +1,7 @@
 module type U = sig
   type ('a, 'b) t
   val create : int -> ('a, 'b) t
-  val apply : ('a,'b) t -> 'a -> ('a -> 'a * 'b) -> int -> 'a * 'b
+  val apply : ('a,'b) t -> 'a -> ('a -> 'a * 'b) -> 'a * 'b
 end
 
 module Make (Uni : U) (Seq : Sequential.SeqObject.S) = struct
@@ -15,9 +15,9 @@ module Make (Uni : U) (Seq : Sequential.SeqObject.S) = struct
     num_threads;
   }
 
-  let apply obj op tid =
+  let apply obj op =
     let invoc state = Seq.apply state op in
     let initial_obj = Seq.empty in
-    let (_new_state, result) = Uni.apply obj.u initial_obj invoc tid in
+    let (_new_state, result) = Uni.apply obj.u initial_obj invoc in
     result
 end
