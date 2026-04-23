@@ -4,6 +4,7 @@
  (modules 
   CASConsensus 
   Node 
+  WFUniversalStats
   LFUniversal 
   WFUniversal
   Universal

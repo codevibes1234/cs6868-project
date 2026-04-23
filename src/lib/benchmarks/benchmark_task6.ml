@@ -68,9 +68,8 @@ let benchmark_stack_lf_universal ~num_threads ~total_ops =
           for i = 0 to pairs - 1 do
             ignore
               (LFUniversalStack.apply stack
-                 (Sequential.SequentialStack.Push (tid lsl 20 + i))
-                 tid);
-            ignore (LFUniversalStack.apply stack Sequential.SequentialStack.Pop tid)
+                (Sequential.SequentialStack.Push (tid lsl 20 + i)));
+              ignore (LFUniversalStack.apply stack Sequential.SequentialStack.Pop)
           done))
 
 let benchmark_stack_wf_universal ~num_threads ~total_ops =
@@ -82,9 +81,8 @@ let benchmark_stack_wf_universal ~num_threads ~total_ops =
           for i = 0 to pairs - 1 do
             ignore
               (WFUniversalStack.apply stack
-                 (Sequential.SequentialStack.Push (tid lsl 20 + i))
-                 tid);
-            ignore (WFUniversalStack.apply stack Sequential.SequentialStack.Pop tid)
+                (Sequential.SequentialStack.Push (tid lsl 20 + i)));
+              ignore (WFUniversalStack.apply stack Sequential.SequentialStack.Pop)
           done))
 
 let benchmark_queue_lockfree ~num_threads ~total_ops =
@@ -118,9 +116,8 @@ let benchmark_queue_lf_universal ~num_threads ~total_ops =
           for i = 0 to pairs - 1 do
             ignore
               (LFUniversalQueue.apply q
-                 (Sequential.SequentialQueue.Enqueue (tid lsl 20 + i))
-                 tid);
-            ignore (LFUniversalQueue.apply q Sequential.SequentialQueue.Dequeue tid)
+                (Sequential.SequentialQueue.Enqueue (tid lsl 20 + i)));
+              ignore (LFUniversalQueue.apply q Sequential.SequentialQueue.Dequeue)
           done))
 
 let benchmark_queue_wf_universal ~num_threads ~total_ops =
@@ -132,9 +129,8 @@ let benchmark_queue_wf_universal ~num_threads ~total_ops =
           for i = 0 to pairs - 1 do
             ignore
               (WFUniversalQueue.apply q
-                 (Sequential.SequentialQueue.Enqueue (tid lsl 20 + i))
-                 tid);
-            ignore (WFUniversalQueue.apply q Sequential.SequentialQueue.Dequeue tid)
+                (Sequential.SequentialQueue.Enqueue (tid lsl 20 + i)));
+              ignore (WFUniversalQueue.apply q Sequential.SequentialQueue.Dequeue)
           done))
 
 let append_csv_row oc ~threads ~kind ~impl ~total_ops ~secs =
