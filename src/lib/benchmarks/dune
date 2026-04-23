@@ -3,3 +3,15 @@
  (name benchmark_task6)
  (modules benchmark_task6)
  (libraries src unix))
+
+(executable
+ (public_name cost_of_helping)
+ (name cost_of_helping)
+ (modules cost_of_helping)
+ (libraries src unix))
+
+(executable
+ (public_name throughput)
+ (name throughput)
+ (modules throughput)
+ (libraries src unix))
