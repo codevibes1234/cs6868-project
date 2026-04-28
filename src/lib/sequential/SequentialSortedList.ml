@@ -21,7 +21,7 @@ let rec remove x = function
     if c = 0 then t
     else h :: remove x t
 
-let apply op state =
+let apply state op =
   match op with
   | Insert x  -> (insert x state, None)
   | Remove x  -> (remove x state, None)
