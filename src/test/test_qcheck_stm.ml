@@ -290,18 +290,39 @@ let arb_skiplst_cmd _state =
      ])
 
 module SkipListBase = struct
-  type state        = int SequentialSkipList.state
+  type state        = int list
   type nonrec cmd   = int SequentialSkipList.op
   let arb_cmd       = arb_skiplst_cmd
   let show_cmd = show_skiplst_cmd
-  let init_state    = SequentialSkipList.empty ()
+  let init_state    = []
+
+  let insert_sorted x xs =
+    let rec loop acc = function
+      | [] -> List.rev (x :: acc)
+      | y :: ys as rest ->
+        if x = y then List.rev_append acc rest
+        else if x < y then List.rev_append acc (x :: rest)
+        else loop (y :: acc) ys
+    in
+    loop [] xs
+
   let next_state cmd state =
-    let (next, _) = SequentialSkipList.apply cmd state in
-    next
+    match cmd with
+    | SequentialSkipList.Insert x -> insert_sorted x state
+    | SequentialSkipList.Remove x -> List.filter (fun y -> y <> x) state
+    | SequentialSkipList.Contains _ -> state
+
   let precond _c _s = true
   let postcond cmd state result =
     match result with
-    | Res ((Option Int, _), v) ->   let expected : int option = snd (SequentialSkipList.apply cmd state) in v = expected
+    | Res ((Option Int, _), v) ->
+      let expected : int option =
+        match cmd with
+        | SequentialSkipList.Contains x -> if List.mem x state then Some x else None
+        | SequentialSkipList.Insert _ -> None
+        | SequentialSkipList.Remove _ -> None
+      in
+      v = expected
     | _ -> false
   let cleanup _     = ()
 end
@@ -401,7 +422,7 @@ let () =
   run_tests (module WFQueueSpec) "WF Queue";
   run_tests (module LFListSpec) "LF Sorted List";
   run_tests (module WFListSpec) "WF Sorted List";
-  (* run_tests (module LFSkipListSpec) "LF Skip List";
-  run_tests (module WFSkipListSpec) "WF Skip List"; *)
+  run_tests (module LFSkipListSpec) "LF Skip List";
+  run_tests (module WFSkipListSpec) "WF Skip List";
   run_tests (module LFSBstSpec) "LF BST";
   run_tests (module WFBstSpec) "WF BST";
