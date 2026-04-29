@@ -15,6 +15,7 @@ import csv
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List
+from matplotlib.ticker import LogLocator, LogFormatter
 
 import matplotlib.pyplot as plt
 
@@ -40,14 +41,18 @@ def load_rows(csv_path: Path) -> List[dict[str, str]]:
 
 
 def group_throughput(rows: List[dict[str, str]], object_kind: str) -> Dict[str, Dict[int, float]]:
+    """Group CSV rows by implementation and thread count.
+
+    The CSV now contains `ops_per_microsecond`, so read that directly.
+    Returns a mapping: implementation -> (threads -> ops_per_microsecond).
+    """
     grouped: Dict[str, Dict[int, float]] = defaultdict(dict)
     for row in rows:
         if row["object"] != object_kind:
             continue
         implementation = row["implementation"]
         threads = int(row["threads"])
-        ops_per_sec = float(row["ops_per_sec"])
-        ops_per_us = ops_per_sec / 1_000_000.0
+        ops_per_us = float(row["ops_per_microsecond"])
         grouped[implementation][threads] = ops_per_us
     return grouped
 
@@ -59,21 +64,24 @@ def plot_group(
     output_path: Path,
 ) -> None:
     plt.figure(figsize=(10, 6))
-
+    ax = plt.gca()
     for implementation in implementations:
         thread_map = grouped.get(implementation, {})
         if not thread_map:
             continue
         threads = sorted(thread_map)
         values = [thread_map[thread] for thread in threads]
-        plt.plot(threads, values, marker="o", linewidth=2, label=implementation)
+        ax.plot(threads, values, marker="o", linewidth=2, label=implementation)
 
-    plt.title(title)
-    plt.xlabel("Number of threads")
-    plt.ylabel("Operations per microsecond")
-    plt.yscale("log")
-    plt.grid(True, alpha=0.3)
-    plt.legend()
+    ax.set_title(title)
+    ax.set_xlabel("Number of threads")
+    ax.set_ylabel("Operations per microsecond")
+    ax.set_yscale("log")
+    # Use powers-of-10 major ticks and formatter
+    ax.yaxis.set_major_locator(LogLocator(base=10.0))
+    ax.yaxis.set_major_formatter(LogFormatter(base=10.0))
+    ax.grid(True, alpha=0.3, which="both")
+    ax.legend()
     plt.tight_layout()
     plt.savefig(output_path, dpi=200)
     plt.close()
