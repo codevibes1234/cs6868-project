@@ -7,6 +7,10 @@
  (libraries src sequential))
 
 (test
+ (name test_tsan)
+ (libraries src sequential))
+
+(test
  (name qcheck_lin_tests)
  (libraries
   src
@@ -15,6 +19,6 @@
   qcheck-lin.lin
   qcheck-lin.domain))
 
- (test
+(test
  (name test_qcheck_stm)
  (libraries src sequential qcheck-stm.domain qcheck-stm.sequential))
