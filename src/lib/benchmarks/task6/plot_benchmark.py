@@ -52,7 +52,7 @@ def group_throughput(rows: List[dict[str, str]], object_kind: str) -> Dict[str, 
             continue
         implementation = row["implementation"]
         threads = int(row["threads"])
-        ops_per_us = float(row["ops_per_microsecond"])
+        ops_per_us = float(row["ops_per_microsecond"])*1e6
         grouped[implementation][threads] = ops_per_us
     return grouped
 
@@ -75,7 +75,7 @@ def plot_group(
 
     ax.set_title(title)
     ax.set_xlabel("Number of threads")
-    ax.set_ylabel("Operations per microsecond")
+    ax.set_ylabel("Operations per second")
     ax.set_yscale("log")
     # Use powers-of-10 major ticks and formatter
     ax.yaxis.set_major_locator(LogLocator(base=10.0))
@@ -94,7 +94,7 @@ def main() -> None:
     parser.add_argument(
         "csv_file",
         nargs="?",
-        default="benchmark_vs_threads_1_to_8.csv",
+        default="benchmark_vs_threads_1_to_15.csv",
         help="Path to the benchmark CSV file",
     )
     parser.add_argument(

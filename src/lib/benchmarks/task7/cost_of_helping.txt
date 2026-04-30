@@ -1,0 +1,5 @@
+stack,threads=15,total_ops=20000,helped=19990000,own=20000,help_ratio=0.999000
+queue,threads=15,total_ops=20000,helped=19990000,own=20000,help_ratio=0.999000
+bst,threads=15,total_ops=20000,helped=19990000,own=20000,help_ratio=0.999000
+sortedlist,threads=15,total_ops=20000,helped=19990000,own=20000,help_ratio=0.999000
+skiplist,threads=15,total_ops=20000,helped=19990000,own=20000,help_ratio=0.999000
